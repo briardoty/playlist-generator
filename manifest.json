@@ -1,0 +1,30 @@
+{
+  "AppName": {
+    "en": "Spotify Playlist Generator App"
+  },
+  "BundleIdentifier": "playlist-generator",
+  "AppDescription": {
+    "en": "Test app for generating smart playlists."
+  },
+  "AcceptedLinkTypes": [
+    "playlist"
+  ],
+  "BundleType": "Application",
+  "BundleVersion": "0.2",
+  "DefaultTabs": [
+    {
+      "arguments": "index",
+      "title": {
+        "en": "Home"
+      }
+    }
+  ],
+  "Dependencies": {
+    "api": "1.10.2",
+    "views": "1.18.1"
+  },
+  "SupportedLanguages": [
+    "en"
+  ],
+  "VendorIdentifier": "co.spotify"
+}
