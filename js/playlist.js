@@ -48,7 +48,9 @@ function PlaylistGenerator() {
 		$('#trackRating').val('(Rate track)');
 	
 		var playlistIndex = $('#playlist').val();
-		if (playlistIndex != 'select') {
+		if (playlistIndex == 'select') {
+			$('#playlist-player').empty();
+		} else {
 			// load selected playlist on page
 			var userLib = Library.forCurrentUser();
 			userLib.playlists.snapshot().done(function (snapshot) {
@@ -83,17 +85,20 @@ function PlaylistGenerator() {
 	
 	// called on change of track rating select option
 	function setTrackRating() {
-		// grab user rating and send ajax request to update in DB
-		var rating = $('#trackRating').val();
-		var trackURI = $('#trackName').text();
-		
-		// create request
-		var request = {};
-		request['TrackURI'] = trackURI;
-		request['rating'] = rating;
-		
-		var requestBuilder = new SpotifyRequestBuilder();
-		requestBuilder.postRequest(common.setTrackRatingURL, onSetTrackRating, JSON.stringify(request));
+		// check that a track is selected
+		if (!$('#trackName').is(':empty')) {
+			// grab user rating and send ajax request to update in DB
+			var rating = $('#trackRating').val();
+			var trackURI = $('#trackName').text();
+			
+			// create request
+			var request = {};
+			request['TrackURI'] = trackURI;
+			request['rating'] = rating;
+			
+			var requestBuilder = new SpotifyRequestBuilder();
+			requestBuilder.postRequest(common.setTrackRatingURL, onSetTrackRating, JSON.stringify(request));
+		}
 	}
 	
 	// callback for getTrackRating; puts rating on page
@@ -105,9 +110,10 @@ function PlaylistGenerator() {
 		}
 	}
 	
-	//
+	// callback for setTrackRating; alerts user if anything went wrong
 	function onSetTrackRating(response) {
-		alert(response.result);
+		if (response.result == 'error')
+			alert('Error sending request to set track rating.');
 	}
 }
 
