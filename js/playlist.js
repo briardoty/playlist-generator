@@ -2,10 +2,10 @@
 
 // container function for playlist generator module
 function PlaylistGenerator() {
-	var list;
-	var common = new Common();
+	var list; // list of tracks currently displayed on page
+	var common = new Common(); // common variables
 
-	// include spotify api
+	// include spotify framework
 	this.initialize = function () {
 		require(['$api/models', '$views/list#List', '$api/library#Library'], createPlaylist);
 	}
@@ -15,7 +15,7 @@ function PlaylistGenerator() {
 		// connect events
 		$('#playlist').change(function() { changePlaylist(models, List, Library); });
 		$('#playlist-player').click(selectTrack);
-		//$('#trackRating').change();
+		$('#trackRating').change(setTrackRating);
 		
 		// get playlists in current user's library
 		loadPlaylistData(Library);
@@ -43,6 +43,10 @@ function PlaylistGenerator() {
 	
 	// called on change of playlist select element
 	function changePlaylist(models, List, Library) {
+		// clear track specific data
+		$('#trackName').empty();
+		$('#trackRating').val('(Rate track)');
+	
 		var playlistIndex = $('#playlist').val();
 		if (playlistIndex != 'select') {
 			// load selected playlist on page
@@ -77,8 +81,32 @@ function PlaylistGenerator() {
 		requestBuilder.postRequest(common.getTrackRatingURL, onGetTrackRating, JSON.stringify(request));
 	}
 	
-	// TODO: callback for getTrackRating; puts rating on page
+	// called on change of track rating select option
+	function setTrackRating() {
+		// grab user rating and send ajax request to update in DB
+		var rating = $('#trackRating').val();
+		var trackURI = $('#trackName').text();
+		
+		// create request
+		var request = {};
+		request['TrackURI'] = trackURI;
+		request['rating'] = rating;
+		
+		var requestBuilder = new SpotifyRequestBuilder();
+		requestBuilder.postRequest(common.setTrackRatingURL, onSetTrackRating, JSON.stringify(request));
+	}
+	
+	// callback for getTrackRating; puts rating on page
 	function onGetTrackRating(response) {
+		if (response.result == '0') {
+			$('#trackRating').val('(Rate track)');
+		} else {
+			$('#trackRating').val(response.result);
+		}
+	}
+	
+	//
+	function onSetTrackRating(response) {
 		alert(response.result);
 	}
 }
