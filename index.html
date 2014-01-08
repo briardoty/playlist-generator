@@ -7,16 +7,35 @@
         <link rel="stylesheet" href="css/main.css">
         <link rel="stylesheet" href="css/github.css">
     </head>
+	
     <body>
         <div id="wrapper">
             <div id="index" class="section">
                 <h1>Playlist Generator</h1>
-                <h2 id="text1"></h2>
-                <ul>
-                </ul>
-			<div id="playlist-player"></div>
+				
+				<!-- app page content -->
+				<form>
+					<label>Playlist:  </label><select id="playlist"></select><br/>
+					<label>Track:  </label><span id="trackName"></span><br/>
+					<label>Rating:  </label>
+					<select id="trackRating">
+						<option>(Rate track)</option>
+						<option>1</option>
+						<option>2</option>
+						<option>3</option>
+						<option>4</option>
+						<option>5</option>
+					</select>
+				</form>
+				<div id="playlist-player"></div>
+				<div id="errormsg"></div>
             </div>
         </div>
+		
+		<!-- scripts linked at bottom -->
+		<script src="/js/jquery-2.0.3.min.js"></script>
+		<script src="/js/Common.js"></script>
+		<script src="/js/RequestBuilder.js"></script>
         <script src="/js/playlist.js"></script>
     </body>
 </html>
