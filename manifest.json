@@ -9,6 +9,9 @@
   "AcceptedLinkTypes": [
     "playlist"
   ],
+  "ApplicationLinkTypes": [
+	"artist"
+  ],
   "BundleType": "Application",
   "BundleVersion": "0.2",
   "DefaultTabs": [

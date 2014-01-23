@@ -6,34 +6,55 @@
         <link rel="stylesheet" href="$views/css/buttons.css">
         <link rel="stylesheet" href="css/main.css">
         <link rel="stylesheet" href="css/github.css">
+		<link rel="stylesheet" href="css/playlist.css">
     </head>
 	
     <body>
         <div id="wrapper">
             <div id="index" class="section">
-                <h1>Playlist Generator</h1>
+                <!--<h1>Playlist Generator</h1>-->
 				
 				<!-- app page content -->
-				<form>
-					<label>Playlist:  </label><select id="playlist"></select><br/>
-					<label>Track:  </label><span id="trackName"></span><br/>
-					<label>Rating:  </label>
-					<select id="trackRating">
-						<option val="(Rate track)">(Rate track)</option>
-						<option val="1">1</option>
-						<option val="2">2</option>
-						<option val="3">3</option>
-						<option val="4">4</option>
-						<option val="5">5</option>
-					</select>
-				</form>
-				<div id="playlist-player"></div>
+				<div id="controls">
+				
+					<form id="ratingsForm">
+						<fieldset>
+							<legend>Rate Tracks</legend>
+							<label>Playlist:  </label><select id="playlist"></select><br/>
+							<label>Track:  </label><span id="trackName"></span><br/>
+							<label>Rating:  </label>
+							<select id="trackRating">
+								<option val="(Rate track)">(Rate track)</option>
+								<option val="1">1</option>
+								<option val="2">2</option>
+								<option val="3">3</option>
+								<option val="4">4</option>
+								<option val="5">5</option>
+							</select><br />
+						</fieldset>
+					</form>
+					
+					<form id="playlistForm">
+						<fieldset>
+							<legend>Generate Playlists</legend>
+							<input id="newPlaylist" type="text" placeholder="New Playlist Name" /><br/>
+							<div id="artistDrop">Drag artists here.</div>
+							<input id="clearArtistButton" value="Clear Artists" type="button" />
+							<input id="playlistButton" value="Create Playlist" type="button" />
+						</fieldset>
+					</form>
+					
+				</div>
+				
+				<div id="testText"></div>
+				<div id="playlistPlayer"></div>
             </div>
         </div>
 		
 		<!-- scripts linked at bottom -->
 		<script src="/js/jquery-2.0.3.min.js"></script>
 		<script src="/js/Common.js"></script>
+		<script src="/js/DataManger.js"></script>
 		<script src="/js/RequestBuilder.js"></script>
         <script src="/js/playlist.js"></script>
     </body>

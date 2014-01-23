@@ -1,0 +1,29 @@
+/* Playlist Generator Styles */
+form#ratingsForm {
+	float: left;
+	width: 45%;
+	display: inline;
+}
+
+form#playlistForm {
+	float: right;
+	width: 45%;
+	display: inline;
+}
+
+fieldset {
+	border: 1px solid #bbbbbb;
+	border-radius: 12px;
+	text-align: left;
+	background-color: #dddddd;
+}
+
+#playlistPlayer {
+	clear: both;
+}
+
+#artistDrop {
+	border: 1px solid #bbbbbb;
+	background-color: #ffffff;
+	padding: 4px;
+}
