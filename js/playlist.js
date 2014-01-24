@@ -3,8 +3,8 @@
 // container function for playlist generator module
 require(["$api/models", "$views/list#List", "$api/library#Library"], function(models, List, Library) {
 	var list; 														// list of tracks currently displayed on page
+	var artistPool = [];											// list of artists from which to generate playlists
 	var common = new Common(); 					// common variables
-	var dataManager = new DataManager(); 	// data manager module
 	initialize();													// init app
 	
 	// generate playlist from current user"s library
@@ -12,9 +12,9 @@ require(["$api/models", "$views/list#List", "$api/library#Library"], function(mo
 		// connect events
 		$("#playlist").change(changePlaylist);
 		$("#playlistPlayer").click(selectTrack);
-		$("#trackRating").change(dataManager.setTrackRating);
-		$("#clearArtistButton").click(clearArtists);
-		$("#playlistButton").click(onCreatePlaylistClick);
+		$("#trackRating").change(setTrackRating);
+		$("#clearArtistButton").click(clearArtistPool);
+		$("#playlistButton").click(createPlaylist);
 		
 		var dropBox = document.querySelector("#artistDrop");
 
@@ -44,8 +44,9 @@ require(["$api/models", "$views/list#List", "$api/library#Library"], function(mo
             var artist = models.Artist.fromURI(e.dataTransfer.getData("text"));
 			this.classList.remove("over");
 			
-			artist.load("name").done(function(artist){
+			artist.load("name","uri").done(function(artist){
 				$("#artistDrop").append("<p>" + artist.name + "</p>");
+				artistPool.push(artist.uri);
 			});
         });
 		
@@ -123,70 +124,52 @@ require(["$api/models", "$views/list#List", "$api/library#Library"], function(mo
 		}
 	}
 	
+	// called on select of new rating in track rating drop down
+	function setTrackRating() {
+		// check that a track is selected
+		if (!$("#trackName").is(":empty")) {
+			// grab user rating and send ajax request to update in DB
+			var rating = $("#trackRating").val();
+			var trackURI = $("#trackName").text();
+			
+			// create request
+			var request = {};
+			request["TrackURI"] = trackURI;
+			request["rating"] = rating;
+			
+			var requestBuilder = new SpotifyRequestBuilder();
+			requestBuilder.postRequest(common.setTrackRatingURL, onSetTrackRating, JSON.stringify(request));
+		}
+	}
+	
+	// setTrackRating callback
+	function onSetTrackRating(response) {
+		if (response.result == "error")
+			alert("Error sending request to set track rating.");
+	}
+	
 	// clears artists in pool for playlist generator
-	function clearArtists() {
+	function clearArtistPool() {
 		$("#artistDrop")
 			.find("p")
 			.remove()
-			.end()
+			.end();
+		artistPool = [];
 	}
 	
-	// called on click of make playlist button, checks if all artists in library are in DB
-	function onCreatePlaylistClick() {
-		// get artists in user library
-		Library.forCurrentUser().load("artists").done(function(userLib) {
-			userLib.artists.snapshot().done(function(snapshot) {
-				// compare to artists in user DB
-			});
-		});
+	// called on click of create playlist button
+	function createPlaylist() {
+		// create request
+		var request = {};
+		request["artistPool"] = artistPool;
 		
-		// compare to artists in user DB
-	
-		//Library.forCurrentUser().load("artists").done(cllbk);
-		models.Artist.fromURI("spotify:artist:1YK8JdPbiaMSnf4hrlBkGT").load("albums").done(cllbk);
+		var requestBuilder = new SpotifyRequestBuilder();
+		requestBuilder.postRequest(common.generatePlaylistURL, onCreatePlaylist, JSON.stringify(request));
 	}
 	
-	//
-	function cllbk(artist) {
-		artist.albums.snapshot().done(function(snapshot) {
-			for (var i = 0; i < snapshot.length; i++) {
-				var albumGroup = snapshot.get(i);
-				$("#testText").append(album.name);
-			}
-		});
-	}
-	
-	// called on click of create playlist button; dynamically generates playlist
-	function makePlaylist2() {
-		// get artists in user library
-		var userLib = Library.forCurrentUser();
-		userLib.artists.snapshot().done(function (snapshot) {
-			var l = snapshot.length;
-			for (var i = 0; i < 2; i++) {
-				var artist = snapshot.get(i);
-				$("#testText").append(artist.name);
-				artist.load("albums").done(function(artist) {
-					artist.albums.snapshot().done(function (snapshot) {
-						for (var j = 0; j < 2; j++) {
-							var album = snapshot.get(j);
-							$("#testText").append(album.name);
-							album.load("tracks").done(function(album) {
-								album.tracks.snapshot().done(function(snapshot) {
-									for (var k = 0; k < 2; k++) {
-										var track = snapshot.get(k);
-										$("#testText").append(track.name);
-									}
-								});
-							});
-						}
-					});
-				});
-				//$("#testText").append(artist.name);
-			}	
-			// TODO: get track URIs of artists in user library
-		
-			// make playlist with some of these songs
-		});
+	// createPlaylist callback processes new playlist response
+	function onCreatePlaylist(response) {
+		alert(response.result);
 	}
 });
 

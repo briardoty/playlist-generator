@@ -45,5 +45,25 @@
                 return "Error sending request to set track rating.";
             }
         }
+
+        /// <summary>
+        /// Generates playlist and returns list of track URIs to the client.
+        /// </summary>
+        /// <param name="artistPool">Array of Spotify artist URIs</param>
+        /// <returns></returns>
+        [WebMethod]
+        public static string GeneratePlaylist(string[] artistPool)
+        {
+            try
+            {
+                BusinessLayer.DataManager dataManager = new BusinessLayer.DataManager();
+                string[] playlist = dataManager.GeneratePlaylist(artistPool);
+                return new JavaScriptSerializer().Serialize(playlist);
+            }
+            catch
+            {
+                return "Error generating playlist.";
+            }
+        }
     }
 }
