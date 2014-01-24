@@ -32,7 +32,6 @@ require(["$api/models", "$views/list#List", "$api/library#Library"], function(mo
         dropBox.addEventListener("dragover", function(e){
             e.preventDefault();
             e.dataTransfer.dropEffect = "copy";
-            return false;
         });
 
         dropBox.addEventListener("dragleave", function(e){
@@ -42,11 +41,12 @@ require(["$api/models", "$views/list#List", "$api/library#Library"], function(mo
 
         dropBox.addEventListener("drop", function(e){
             e.preventDefault();
-            var drop = models.Artist.fromURI(e.dataTransfer.getData("text"));
-            this.classList.remove("over");
-            var successMessage = document.createElement("p");
-            successMessage.innerHTML = drop.uri;
-            this.appendChild(successMessage);
+            var artist = models.Artist.fromURI(e.dataTransfer.getData("text"));
+			this.classList.remove("over");
+			
+			artist.load("name").done(function(artist){
+				$("#artistDrop").append("<p>" + artist.name + "</p>");
+			});
         });
 		
 		// get playlists in current user"s library
@@ -125,7 +125,10 @@ require(["$api/models", "$views/list#List", "$api/library#Library"], function(mo
 	
 	// clears artists in pool for playlist generator
 	function clearArtists() {
-		alert("hey");
+		$("#artistDrop")
+			.find("p")
+			.remove()
+			.end()
 	}
 	
 	// called on click of make playlist button, checks if all artists in library are in DB
