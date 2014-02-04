@@ -40,9 +40,9 @@
                 dataManager.SetTrackRating(TrackURI, rating);
                 return new JavaScriptSerializer().Serialize("Successfully set track " + TrackURI + "'s rating to " + rating.ToString());
             }
-            catch
+            catch (Exception e)
             {
-                return "Error sending request to set track rating.";
+                return "Error sending request to set track rating: " + e.Message;
             }
         }
 
@@ -60,9 +60,9 @@
                 string[] playlist = dataManager.GeneratePlaylist(artistPool);
                 return new JavaScriptSerializer().Serialize(playlist);
             }
-            catch
+            catch (Exception e)
             {
-                return "Error generating playlist.";
+                return "Error generating playlist: " + e.Message;
             }
         }
     }

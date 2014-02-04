@@ -169,7 +169,7 @@ require(["$api/models", "$views/list#List", "$api/library#Library"], function(mo
 	
 	// createPlaylist callback processes new playlist response
 	function onCreatePlaylist(response) {
-		alert(response.result);
+		alert(response.result + response.error + response.errorText);
 	}
 });
 

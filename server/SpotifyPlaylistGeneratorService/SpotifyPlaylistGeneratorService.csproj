@@ -72,6 +72,8 @@
     <Compile Include="BusinessLayer\DataManager.cs" />
     <Compile Include="DataAccessLayer\DataProvider.cs" />
     <Compile Include="DataAccessLayer\DBAccessUtility.cs" />
+    <Compile Include="DataAccessLayer\WebServiceAccessUtility.cs" />
+    <Compile Include="Model\EchoNestResponse.cs" />
     <Compile Include="Model\PlaylistGenerator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Pages\DefaultRequestHandler.aspx.cs">
