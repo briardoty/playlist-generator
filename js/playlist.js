@@ -46,7 +46,7 @@ require(["$api/models", "$views/list#List", "$api/library#Library"], function(mo
 			
 			artist.load("name","uri").done(function(artist){
 				$("#artistDrop").append("<p>" + artist.name + "</p>");
-				artistPool.push(artist.uri);
+				artistPool.push(artist.name + "/" + artist.uri);
 			});
         });
 		

@@ -5,6 +5,8 @@
     using System.Linq;
     using System.Web;
     using System.Web.Script.Serialization;
+    using System.Xml;
+    using System.Xml.XPath;
 
     /// <summary>
     /// Class generates playlists.
@@ -15,6 +17,7 @@
         /// Webservice URL to search Echo Nest for artist tracks.
         /// </summary>
         private string echoNestTrackURL = "http://developer.echonest.com/api/v4/artist/songs";
+        private string wsSpotifyURL = "http://ws.spotify.com/search/1/track";
         private string apiKey = "YCCWMXIPWV1SIY5OV";
 
         /// <summary>
@@ -29,7 +32,8 @@
             foreach (string artist in artistPool)
             {
                 string artistURI = getArtistURI(artist);
-                List<string> trackList = getDiscography(artistURI);
+                string artistName = getArtistName(artist);
+                List<string> trackList = getDiscography(artistURI, artistName);
                 result.AddRange(trackList);
             }
             return result.ToArray();
@@ -50,11 +54,24 @@
         }
 
         /// <summary>
+        /// Converts given Spotify artist URI to just the artist name.
+        /// </summary>
+        /// <param name="artist"></param>
+        /// <returns></returns>
+        private string getArtistName(string artist)
+        {
+            char[] delimiter = { '/' };
+            string[] tokens = artist.Split(delimiter);
+            string artistName = tokens[0];
+            return artistName;
+        }
+
+        /// <summary>
         /// Pulls and creates list of tracks by given artist from EchoNest webservice.
         /// </summary>
         /// <param name="artistURI"></param>
         /// <returns></returns>
-        private List<string> getDiscography(string artistURI)
+        private List<string> getDiscography(string artistURI, string artistName)
         {
             List<string> result = new List<string>();
 
@@ -69,11 +86,13 @@
 
             // process response
             JavaScriptSerializer deserializer = new JavaScriptSerializer();
-            EchoNestResponse deserializedResponse = new EchoNestResponse();
-            deserializedResponse = deserializer.Deserialize<EchoNestResponse>(response);
+            EchoNestTrackResponse deserializedResponse = new EchoNestTrackResponse();
+            deserializedResponse = deserializer.Deserialize<EchoNestTrackResponse>(response);
             foreach (Model.Song song in deserializedResponse.response.songs)
             {
-                result.Add(song.title);
+                // get that song's spotify uri and append to result
+                string trackURI = getTrackURI(artistName, song.title);
+                result.Add(trackURI);
             }
 
             // potentially get remaining pages of results
@@ -88,7 +107,7 @@
                 response = DataAccessLayer.WebServiceAccessUtility.GetResultPage(this.echoNestTrackURL, args);
 
                 // process
-                deserializedResponse = deserializer.Deserialize<EchoNestResponse>(response);
+                deserializedResponse = deserializer.Deserialize<EchoNestTrackResponse>(response);
                 foreach (Model.Song song in deserializedResponse.response.songs)
                 {
                     result.Add(song.title);
@@ -96,6 +115,36 @@
             }
 
             return result;
+        }
+
+        /// <summary>
+        /// Calls functions to look up track URI using spotify web service search with given params.
+        /// </summary>
+        /// <param name="artistName"></param>
+        /// <param name="trackName"></param>
+        /// <returns></returns>
+        private string getTrackURI(string artistName, string trackName)
+        {
+            try
+            {
+                // make and send request
+                Dictionary<string, string> args = new Dictionary<string, string>();
+                args.Add("q", "artist:" + artistName + " title:" + trackName);
+                string response = DataAccessLayer.WebServiceAccessUtility.GetResultPage(this.wsSpotifyURL, args);
+
+                // extract track URI from XML response
+                XmlDocument xml = new XmlDocument();
+                XmlNamespaceManager nsmgr = new XmlNamespaceManager(xml.NameTable);
+                nsmgr.AddNamespace("ns", "http://www.spotify.com/ns/music/1");
+                xml.LoadXml(response);
+                XmlNode node = xml.SelectSingleNode("/ns:tracks/ns:track[1]", nsmgr);
+                string trackURI = node.Attributes["href"].InnerText;
+                return trackURI;
+            }
+            catch (Exception e)
+            {
+                return "";
+            }
         }
     }
 }

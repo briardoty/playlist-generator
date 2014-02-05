@@ -1,6 +1,9 @@
 ﻿namespace SpotifyPlaylistGeneratorService.Model
 {
-    public class EchoNestResponse
+    /// <summary>
+    /// Base class for responses from EchoNest track search.
+    /// </summary>
+    public class EchoNestTrackResponse
     {
         public Response response { get; set; }
     }
